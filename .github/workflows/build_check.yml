@@ -1,0 +1,24 @@
+name: CI Checks for build
+
+on:
+  push:
+    branches-ignore:   
+      - 'release**'
+      - 'main'
+      - 'master'
+
+jobs:
+  test_build:
+    name: Test the Build
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3      
+      - name: Perform a test build
+        run: |
+          docker build -f Dockerfile-local -t testimage .
+
+
+
+
