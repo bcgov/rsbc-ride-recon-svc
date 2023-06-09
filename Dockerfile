@@ -16,4 +16,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # RUN chown -R app:app /app
 # USER app
 # CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+USER 1001
 CMD ["gunicorn", "main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:5000", "--error-logfile", "-"]
