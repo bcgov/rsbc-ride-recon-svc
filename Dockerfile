@@ -1,5 +1,6 @@
 # FROM registry.access.redhat.com/ubi8/python-39
-FROM image-registry.openshift-image-registry.svc:5000/be5301-tools/python-3.9-ubi-base-image:1.0
+# FROM image-registry.openshift-image-registry.svc:5000/be5301-tools/python-3.9-ubi-base-image:1.0
+FROM artifacts.developer.gov.bc.ca/rbe5-images/python-3.9-ubi-base-image:1.1
 
 # RUN addgroup --system app && adduser --system --group app
 
@@ -15,4 +16,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # RUN chown -R app:app /app
 # USER app
 # CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+USER 1001
 CMD ["gunicorn", "main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:5000", "--error-logfile", "-"]
