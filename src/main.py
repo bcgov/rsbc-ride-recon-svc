@@ -128,18 +128,41 @@ async def error_retry():
 
 @app.get("/querytable", response_class=JSONResponse)
 async def get_records(request: Request,collection_name: Optional[str] = Query(..., title="collection_name")):
-    query = {}
-    params = request.query_params
-    logging.info('trigering query')
-    respstatus = {"status": "failure"}
     status_code = 500
-    print(params.items())
-    print()
-    # print(collection)
-    # for key, value in query_params.items():
-    #     print(key)
-    #     print(value)
-    return JSONResponse(status_code=status_code, content=respstatus)
+    qry_resp=[]
+    try:
+        query = {}
+        params = request.query_params
+        logging.info('trigering query')
+        qry_staging_collection = db[collection_name]
+        # print(collection)
+        for key, value in params.items():
+            if key=="collection_name":
+                pass
+            elif key=="eventid":
+                query[key]=int(value)
+            else:
+                query[key]=value
+        if len(query)==0:
+            query_rslt = qry_staging_collection.find()
+        else:
+            query_rslt = qry_staging_collection.find(query)
+            # print(list(query_rslt))
+        qry_resp=list(query_rslt)
+        for rec in qry_resp:
+            rec["_id"] = str(rec["_id"])
+            rec["payloaddata"]=json.loads(rec["payloaddata"])
+        if len(qry_resp) == 0:
+            logging.info('no records found for the query')
+            logging.error('no records found for the query')
+            status_code = 404
+        else:
+            status_code=200
+    except Exception as e:
+        logging.info('error in query')
+        logging.error('error in query')
+        logging.error(e)
+    return JSONResponse(status_code=status_code, content=qry_resp)
 
 
 if __name__ == "__main__":
