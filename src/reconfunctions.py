@@ -42,6 +42,9 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                     result = main_staging_collection.update_one(row, new_column)
         except Exception as e:
             reconstatus=False
+            recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
+            new_column = {"$set": {"recon_count": recon_count_val}}
+            result = main_staging_collection.update_one(row, new_column)
             logger.error('error in recon for this row')
             logger.error(row)
             logger.error(e)
