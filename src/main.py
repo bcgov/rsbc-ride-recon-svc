@@ -1,11 +1,12 @@
 import json
 
-from fastapi import FastAPI,Response
+from fastapi import FastAPI,Response,Query,Request
 from fastapi.responses import PlainTextResponse,JSONResponse
 import os
 from pymongo import MongoClient
 import uvicorn
 import logging
+from typing import List, Optional
 
 from reconfunctions import recondestination
 from errorretryfunctions import error_retry_task
@@ -122,6 +123,22 @@ async def error_retry():
         logging.error('error in eror retry job')
         logging.error(e)
 
+    return JSONResponse(status_code=status_code, content=respstatus)
+
+
+@app.get("/querytable", response_class=JSONResponse)
+async def get_records(request: Request,collection_name: Optional[str] = Query(..., title="collection_name")):
+    query = {}
+    params = request.query_params
+    logging.info('trigering query')
+    respstatus = {"status": "failure"}
+    status_code = 500
+    print(params.items())
+    print()
+    # print(collection)
+    # for key, value in query_params.items():
+    #     print(key)
+    #     print(value)
     return JSONResponse(status_code=status_code, content=respstatus)
 
 
