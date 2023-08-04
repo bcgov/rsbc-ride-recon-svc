@@ -165,5 +165,40 @@ async def get_records(request: Request,collection_name: Optional[str] = Query(..
     return JSONResponse(status_code=status_code, content=qry_resp)
 
 
+@app.patch('/updateevent/{eventid}', response_class=JSONResponse)
+async def update_status(eventid: int, payload: dict):
+    logging.info('trigering update')
+    respstatus = {"status": "failure"}
+    status_code = 500
+    try:
+        logging.debug('here is the payload')
+        logging.debug(payload)
+        collection_name=payload.get('collectionName',None)
+        if collection_name is None:
+            status_code = 400
+            raise Exception('collection name not passed in payload')
+        datapayload=payload.get('payloaddata',None)
+        if datapayload is None:
+            status_code = 400
+            raise Exception('payloaddata not passed in payload')
+        db_collection = db[collection_name]
+        # query_main_staging = main_staging_collection.find({"eventid":eventid})
+        db_query = db_collection.find_one({"eventid":eventid})
+        if len(list(db_query)) == 0:
+            logging.info('no record found for the event id')
+            status_code = 404
+            raise Exception('no record found for the event id')
+        else:
+            result = db_collection.update_one({"eventid":eventid},{"$set":datapayload})
+        respstatus = {"status": "success"}
+        status_code = 200
+    except Exception as e:
+        logging.info('error in updating status')
+        logging.error('error in updating status')
+        logging.error(e)
+
+    return JSONResponse(status_code=status_code, content=respstatus)
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=5001, reload=True)
