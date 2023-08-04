@@ -58,7 +58,7 @@ jobs:
     env:
       PR_NUMBER: ${{ github.event.number }}
       PR_IMAGE_STREAM_TAG: ${{ github.sha}}
-      RELEASE_NAME: release_1_4
+      RELEASE_NAME: release_1_6
     steps:
       - name: Checkout Gitops repository
         uses: actions/checkout@v3
