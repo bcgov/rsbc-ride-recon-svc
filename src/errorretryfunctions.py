@@ -12,6 +12,9 @@ def error_retry_task(dbclient,err_staging_collection,err_table_collection,err_th
     for row in results:
         logger.debug('processing row')
         logger.debug(row)
+        if 'errorcategory' in row.keys() and row['errorcategory']=='data_issue':
+            logger.info(f'skipping row for event based on error category: {row["eventid"]}, {row["errorcategory"]}')
+            continue
         try:
             # if row['event_type'] and row['event_type'] == 'event_1':
             if row['eventType'] :
