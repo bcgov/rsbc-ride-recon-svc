@@ -13,7 +13,7 @@ jobs:
     environment: prod
     env:
       DOCKER_IMAGE_TAG: ${{ github.sha}}
-      DOCKER_IMAGE_NAME: rbe5-images/ride-recon-service
+      DOCKER_IMAGE_NAME: rbe5-images/ride-recon-service-prod
       DOCKER_FILE: Dockerfile
     steps:
       - name: Checkout
