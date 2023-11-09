@@ -61,7 +61,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                     bi_table_name=map_event_type_destination(row['eventType'])
                     bi_db_name=map_source_db(row['datasource'])
                     bi_events_table_name = os.getenv('BI_ETK_EVENTS_TABLE')
-                    bi_violations_table_name = os.getenv('BI_ETK_VIOLATIONS_TABLE')
+                    bi_violations_table_name = os.getenv('ETK_VIOLATIONS_TABLE_NAME')
                     bi_geo_table=os.getenv('ETK_GEOLOCATION_TABLE_NAME')
                     # print(bi_db_name)
                     # DONE: Query SQL DB
