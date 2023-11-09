@@ -37,15 +37,25 @@ def map_source_db(source):
 
 def split_etk_event_payloads(payload,eventtype):
     payload_dict=json.loads(payload)
-    eventpayload=payload_dict.pop('event')
-    countspayload=None
-    geopayload=None
-    if eventtype=='etk_issuance':
-        countspayload=payload_dict.pop('counts')
-        geopayload={}
-        geopayload['business_id']=payload_dict['ticket_number']
-        geopayload=json.dumps(geopayload)
-    return json.dumps(payload_dict),json.dumps(eventpayload),countspayload,geopayload
+    eventpayload = None
+    countspayload = None
+    geopayload = None
+    if eventtype=='geolocation':
+        tmp_event=payload_dict.pop('event')
+        main_event={}
+        main_event['business_id']=payload_dict['ticket_number']
+        payload_dict=main_event
+    else:
+        eventpayload=payload_dict.pop('event')
+        countspayload=None
+        geopayload=None
+        if eventtype=='etk_issuance':
+            countspayload=payload_dict.pop('counts')
+            geopayload={}
+            geopayload['business_id']=payload_dict['ticket_number']
+            geopayload=json.dumps(geopayload)
+        eventpayload=json.dumps(eventpayload)
+    return json.dumps(payload_dict),eventpayload,countspayload,geopayload
 
 # def map_source_api_keys(source):
 #     if source=='df':
