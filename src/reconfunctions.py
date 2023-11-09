@@ -71,7 +71,8 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                     mainfound, eventfound, countsfound,geofound = False, False, False,False
                     if mainpayload:
                         mainqrystr = bi_sql_db_obj.prepQuerystr(mainpayload,row['datasource'])
-                        table_name = bi_table_name
+                        table_name=(lambda x: bi_geo_table if x['eventType']=='geolocation' else bi_table_name)(row)
+                        # table_name = bi_table_name
                         reconqrystr = f'SELECT * FROM {table_name} WHERE {mainqrystr}'
                         mainfound = bi_sql_db_obj.reconQuery(reconqrystr,logger)
                     if eventpayload:
