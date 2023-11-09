@@ -21,6 +21,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
             datasrc=row['datasource']
         else:
             continue
+
         if datasrc=='df':
             try:
                 if row['eventType']:
@@ -61,7 +62,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                     bi_table_name=map_event_type_destination(row['eventType'])
                     bi_db_name=map_source_db(row['datasource'])
                     bi_events_table_name = os.getenv('BI_ETK_EVENTS_TABLE')
-                    bi_violations_table_name = os.getenv('ETK_VIOLATIONS_TABLE_NAME')
+                    bi_violations_table_name = os.getenv('BI_ETK_VIOLATIONS_TABLE')
                     bi_geo_table=os.getenv('ETK_GEOLOCATION_TABLE_NAME')
                     # print(bi_db_name)
                     # DONE: Query SQL DB
@@ -71,8 +72,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                     mainfound, eventfound, countsfound,geofound = False, False, False,False
                     if mainpayload:
                         mainqrystr = bi_sql_db_obj.prepQuerystr(mainpayload,row['datasource'])
-                        table_name=(lambda x: bi_geo_table if x['eventType']=='geolocation' else bi_table_name)(row)
-                        # table_name = bi_table_name
+                        table_name = bi_table_name
                         reconqrystr = f'SELECT * FROM {table_name} WHERE {mainqrystr}'
                         mainfound = bi_sql_db_obj.reconQuery(reconqrystr,logger)
                     if eventpayload:
@@ -115,6 +115,25 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                         recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
                         new_column = {"$set": {"recon_count": recon_count_val}}
                         result = main_staging_collection.update_one(row, new_column)
+
+
+
+                    # reconqrystr = f'SELECT * FROM {table_name} WHERE {qrystr}'
+                    # # print(reconqrystr)
+                    # found = bi_sql_db_obj.reconQuery(reconqrystr,logger)
+                    # if found:
+                    #     main_staging_collection.delete_one(row)
+                    #     # DONE: If found save to master table
+                    #     # DONE: Dedup before saving to master
+                    #     query_main_table = main_table_collection.find(row)
+                    #     if len(list(query_main_table)) > 0:
+                    #         return True
+                    #     else:
+                    #         result = main_table_collection.insert_one(row)
+                    # else:
+                    #     recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
+                    #     new_column = {"$set": {"recon_count": recon_count_val}}
+                    #     result = main_staging_collection.update_one(row, new_column)
             except Exception as e:
                 reconstatus=False
                 recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
