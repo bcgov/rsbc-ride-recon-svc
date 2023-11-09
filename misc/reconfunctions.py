@@ -21,6 +21,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
             datasrc=row['datasource']
         else:
             continue
+
         if datasrc=='df':
             try:
                 if row['eventType']:
@@ -114,6 +115,25 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                         recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
                         new_column = {"$set": {"recon_count": recon_count_val}}
                         result = main_staging_collection.update_one(row, new_column)
+
+
+
+                    # reconqrystr = f'SELECT * FROM {table_name} WHERE {qrystr}'
+                    # # print(reconqrystr)
+                    # found = bi_sql_db_obj.reconQuery(reconqrystr,logger)
+                    # if found:
+                    #     main_staging_collection.delete_one(row)
+                    #     # DONE: If found save to master table
+                    #     # DONE: Dedup before saving to master
+                    #     query_main_table = main_table_collection.find(row)
+                    #     if len(list(query_main_table)) > 0:
+                    #         return True
+                    #     else:
+                    #         result = main_table_collection.insert_one(row)
+                    # else:
+                    #     recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
+                    #     new_column = {"$set": {"recon_count": recon_count_val}}
+                    #     result = main_staging_collection.update_one(row, new_column)
             except Exception as e:
                 reconstatus=False
                 recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
