@@ -17,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # USER app
 # CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
 USER 1001
-CMD ["gunicorn", "main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:5000", "--error-logfile", "-"]
+CMD ["gunicorn", "main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:5000", "--timeout","800","--error-logfile", "-"]

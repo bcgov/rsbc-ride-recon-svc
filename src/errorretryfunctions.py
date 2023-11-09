@@ -20,6 +20,11 @@ def error_retry_task(dbclient,err_staging_collection,err_table_collection,err_th
             if row['eventType'] :
                 # DONE: Retry sending to producer api
                 payload_json=row['payloaddata']
+                if row['eventType']=='geolocation':
+                    payload_arr=[]
+                    payload_arr.append(json.loads(payload_json))
+                    payload_json=payload_arr
+                    payload_json=json.dumps(payload_json)
                 producer_api_obj=producerAPITasks(os.getenv('PRODUCER_API_HOST'),logger)
                 headers={'ride-api-key':os.getenv('RIDE_API_KEY'),'Content-Type':'application/json'}
                 logger.debug(payload_json)
