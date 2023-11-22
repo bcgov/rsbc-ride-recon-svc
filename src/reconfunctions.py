@@ -5,7 +5,7 @@ from commonutils import map_event_type_destination,map_source_db,split_etk_event
 import json
 
 
-def recondestination(dbclient,main_staging_collection,main_table_collection,logger):
+def recondestination(dbclient,main_staging_collection,main_table_collection,recon_threshold_count,logger):
 
     # DONE: Query records in staging table
     results = main_staging_collection.find()
@@ -21,6 +21,10 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
             datasrc=row['datasource']
         else:
             continue
+        if row['recon_count']:
+            if row['recon_count']>recon_threshold_count:
+                logger.error('recon count exceeded threshold. skipping row')
+                continue
         if datasrc=='df':
             try:
                 if row['eventType']:
