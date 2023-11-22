@@ -2,10 +2,11 @@
 import os
 from destsqldbfuncs import SqlDBFunctions
 from commonutils import map_event_type_destination,map_source_db,split_etk_event_payloads
+from errorretryfunctions import staging_retry_task
 import json
 
 
-def recondestination(dbclient,main_staging_collection,main_table_collection,logger):
+def recondestination(dbclient,main_staging_collection,main_table_collection,recon_threshold_count,logger):
 
     # DONE: Query records in staging table
     results = main_staging_collection.find()
@@ -21,6 +22,18 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
             datasrc=row['datasource']
         else:
             continue
+        if 'recon_count' in row.keys():
+            # if row['recon_count']>recon_threshold_count and row['recon_count']==recon_threshold_count+1:
+            if row['recon_count'] > 100:
+                retry_status=staging_retry_task(dbclient,row,logger)
+                if retry_status:
+                    main_staging_collection.delete_one(row)
+                else:
+                    pass
+                continue
+            elif row['recon_count']>recon_threshold_count:
+                logger.debug('skipping row as recon count is more than threshold')
+                continue
         if datasrc=='df':
             try:
                 if row['eventType']:
@@ -80,6 +93,8 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                         table_name = bi_events_table_name
                         reconqrystr = f'SELECT * FROM {table_name} WHERE {eventqrystr}'
                         eventfound = bi_sql_db_obj.reconQuery(reconqrystr,logger)
+                    else:
+                        eventfound=True
                     if countspayload:
                         for countsrw in countspayload:
                             tmp_countsrw=json.dumps(countsrw)
@@ -87,7 +102,6 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                             print(countsqrystr)
                             table_name = bi_violations_table_name
                             reconqrystr = f'SELECT * FROM {table_name} WHERE {countsqrystr}'
-                            print(f'Here is: {reconqrystr}')
                             countsfound = bi_sql_db_obj.reconQuery(reconqrystr,logger)
                             if not countsfound:
                                 break
@@ -97,6 +111,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                         eventqrystr = bi_sql_db_obj.prepQuerystr(geopayload, row['datasource'])
                         table_name = bi_geo_table
                         reconqrystr = f'SELECT * FROM {table_name} WHERE {eventqrystr}'
+                        print(f'Here is: {reconqrystr}')
                         geofound = bi_sql_db_obj.reconQuery(reconqrystr, logger)
                     else:
                         geofound=True
