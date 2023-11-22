@@ -2,6 +2,7 @@
 import os
 from destsqldbfuncs import SqlDBFunctions
 from commonutils import map_event_type_destination,map_source_db,split_etk_event_payloads
+from errorretryfunctions import staging_retry_task
 import json
 
 
@@ -22,8 +23,16 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
         else:
             continue
         if row['recon_count']:
-            if row['recon_count']>recon_threshold_count:
-                logger.error('recon count exceeded threshold. skipping row')
+            # if row['recon_count']>recon_threshold_count and row['recon_count']==recon_threshold_count+1:
+            if row['recon_count'] > 100:
+                retry_status=staging_retry_task(dbclient,row,logger)
+                if retry_status:
+                    main_staging_collection.delete_one(row)
+                else:
+                    pass
+                continue
+            elif row['recon_count']>recon_threshold_count:
+                logger.debug('skipping row as recon count is more than threshold')
                 continue
         if datasrc=='df':
             try:
