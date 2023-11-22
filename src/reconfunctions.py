@@ -22,7 +22,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
             datasrc=row['datasource']
         else:
             continue
-        if row['recon_count']:
+        if 'recon_count' in row.keys():
             # if row['recon_count']>recon_threshold_count and row['recon_count']==recon_threshold_count+1:
             if row['recon_count'] > 100:
                 retry_status=staging_retry_task(dbclient,row,logger)
