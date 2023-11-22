@@ -61,3 +61,29 @@ def error_retry_task(dbclient,err_staging_collection,err_table_collection,err_th
             logger.error(e)
 
     return errretrystatus
+
+def staging_retry_task(dbclient,row,logger):
+    errretrystatus = True
+    logger.debug('retry staging row')
+    logger.debug(row)
+    try:
+        payload_json = row['payloaddata']
+        if row['eventType'] == 'geolocation':
+            payload_arr = []
+            payload_arr.append(json.loads(payload_json))
+            payload_json = payload_arr
+            payload_json = json.dumps(payload_json)
+        producer_api_obj = producerAPITasks(os.getenv('PRODUCER_API_HOST'), logger)
+        headers = {'ride-api-key': os.getenv('RIDE_API_KEY'), 'Content-Type': 'application/json'}
+        logger.debug(payload_json)
+        success = producer_api_obj.sendAPIReq(row['apipath'], headers, 'POST', payload_json)
+        if success:
+            return True
+        else:
+            return False
+    except Exception as e:
+        errretrystatus = False
+        logger.error('error in retrying for this row')
+        logger.error(row)
+        logger.error(e)
+        return False
