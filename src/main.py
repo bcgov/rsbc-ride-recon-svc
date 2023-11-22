@@ -32,6 +32,7 @@ err_staging_collection = db[os.getenv('ERR_STG_COLLECTION')]
 main_table_collection = db[os.getenv('MAIN_TABLE_COLLECTION')]
 err_table_collection=db[os.getenv('ERR_TABLE_COLLECTION')]
 err_threshold=os.getenv('ERR_THRESHOLD_COUNT')
+recon_threshold_count=int(os.getenv('RECON_THRESHOLD_COUNT'))
 
 @app.get('/ping', response_class=JSONResponse)
 async def main_ping():
@@ -95,7 +96,7 @@ async def recon_destination():
     respstatus = {"status": "failure"}
     status_code = 500
     try:
-        recon_out=recondestination(client,main_staging_collection,main_table_collection,logging)
+        recon_out=recondestination(client,main_staging_collection,main_table_collection,recon_threshold_count,logging)
         if not(recon_out):
             raise Exception('error in one of the rows during recon')
         respstatus = {"status": "success"}
