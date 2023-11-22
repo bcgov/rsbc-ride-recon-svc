@@ -80,6 +80,8 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                         table_name = bi_events_table_name
                         reconqrystr = f'SELECT * FROM {table_name} WHERE {eventqrystr}'
                         eventfound = bi_sql_db_obj.reconQuery(reconqrystr,logger)
+                    else:
+                        eventfound=True
                     if countspayload:
                         for countsrw in countspayload:
                             tmp_countsrw=json.dumps(countsrw)
@@ -87,7 +89,6 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                             print(countsqrystr)
                             table_name = bi_violations_table_name
                             reconqrystr = f'SELECT * FROM {table_name} WHERE {countsqrystr}'
-                            print(f'Here is: {reconqrystr}')
                             countsfound = bi_sql_db_obj.reconQuery(reconqrystr,logger)
                             if not countsfound:
                                 break
@@ -97,6 +98,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                         eventqrystr = bi_sql_db_obj.prepQuerystr(geopayload, row['datasource'])
                         table_name = bi_geo_table
                         reconqrystr = f'SELECT * FROM {table_name} WHERE {eventqrystr}'
+                        print(f'Here is: {reconqrystr}')
                         geofound = bi_sql_db_obj.reconQuery(reconqrystr, logger)
                     else:
                         geofound=True
