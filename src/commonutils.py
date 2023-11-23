@@ -54,6 +54,9 @@ def split_etk_event_payloads(payload,eventtype):
             geopayload={}
             geopayload['business_id']=payload_dict['ticket_number']
             geopayload=json.dumps(geopayload)
+            main_event = {}
+            main_event['ticket_number'] = payload_dict['ticket_number']
+            payload_dict = main_event
         eventpayload=json.dumps(eventpayload)
     return json.dumps(payload_dict),eventpayload,countspayload,geopayload
 
