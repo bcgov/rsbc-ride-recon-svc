@@ -99,7 +99,10 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
                         eventfound=True
                     if countspayload:
                         for countsrw in countspayload:
-                            tmp_countsrw=json.dumps(countsrw)
+                            send_countsrw = {}
+                            send_countsrw['ticket_number'] = countsrw['ticket_number']
+                            send_countsrw['count_number'] = countsrw['count_number']
+                            tmp_countsrw=json.dumps(send_countsrw)
                             countsqrystr = bi_sql_db_obj.prepQuerystr(tmp_countsrw,row['datasource'])
                             print(countsqrystr)
                             table_name = bi_violations_table_name
