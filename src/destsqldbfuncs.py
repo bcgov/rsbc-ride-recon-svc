@@ -19,7 +19,7 @@ class SqlDBFunctions():
             keys=tmpPayload.keys()
             payloadKey=""
             for v in keys:
-                if "payload" in v:
+                if "payload".upper() in v.upper():
                     payloadKey=v
             payloadForstr=tmpPayload[payloadKey][0]
             for k,v in payloadForstr.items():
@@ -50,17 +50,14 @@ class SqlDBFunctions():
 
 
     def reconQuery(self,queryStr,logger):
-        # print(queryStr)
+        logger.debug(queryStr)
         recordfound=False
         result = self.cursor.execute(queryStr)
         rows = self.cursor.fetchall()
-        logger.debug(queryStr)
         logger.debug(rows)
-        # print(queryStr)
-        # print(rows)
+
         if len(rows)>0:
             recordfound=True
 
         return recordfound
-        # print(rows)
 
