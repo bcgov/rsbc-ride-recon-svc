@@ -24,13 +24,21 @@ class SqlDBFunctions():
             payloadForstr=tmpPayload[payloadKey][0]
             for k,v in payloadForstr.items():
                 if not(v==None):
-                    tmpstr=tmpstr+f"{k}='{v}'"+ " AND "
+                    if (isinstance(v, str) and v.count("'") > 0):
+                        value = v.replace("'", "''")
+                    else:
+                        value = v
+                    tmpstr=tmpstr+f"{k}='{value}'"+ " AND "
             # print(tmpstr[:-5])
         else:
             tmpPayload = json.loads(payload)
             for k, v in tmpPayload.items():
                 if not (v == None):
-                    tmpstr = tmpstr + f"{k}='{v}'" + " AND "
+                    if (isinstance(v, str) and v.count("'") > 0):
+                        value = v.replace("'", "''")
+                    else:
+                        value = v
+                    tmpstr = tmpstr + f"{k}='{value}'" + " AND "
         return tmpstr[:-5]
        # else:
        #      tmpstr = ''
