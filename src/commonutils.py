@@ -25,10 +25,10 @@ source_db_mapping = {
 }
 
 def map_event_type_destination(event_type):
-    tableName = event_table_mapping.get(event_type)
-    if tableName is None:
+    table_name = event_table_mapping.get(event_type)
+    if table_name is None:
         raise ValueError(f"Table name not found for event type: {event_type}")
-    return tableName
+    return table_name
 
 def map_source_db(source):
     return source_db_mapping.get(source)
