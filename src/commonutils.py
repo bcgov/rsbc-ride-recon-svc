@@ -2,38 +2,36 @@
 import os
 import json
 
+event_table_mapping = {
+    'app_accepted': os.getenv('DF_APP_ACCPTED_TABLE_NAME'),
+    'disclosure_sent': os.getenv('DF_DISCLOSURE_SENT_TABLE_NAME'),
+    'evidence_submitted': os.getenv('DF_EV_SUBMTTED_TABLE_NAME'),
+    'payment_received': os.getenv('DF_PAY_RECVD_TABLE_NAME'),
+    'review_scheduled': os.getenv('DF_REV_SCHED_TABLE_NAME'),
+    'etk_disputeupdate': os.getenv('ETK_DISP_UPDATE_TABLE_NAME'),
+    'etk_issuance': os.getenv('ETK_ISSUANCE_TABLE_NAME'),
+    'etk_violations': os.getenv('ETK_VIOLATIONS_TABLE_NAME'),
+    'etk_payment': os.getenv('ETK_PAYMENT_TABLE_NAME'),
+    'payment_query': os.getenv('ETK_PAYQUERY_TABLE_NAME'),
+    'etk_dispute': os.getenv('ETK_DISPUTE_TABLE_NAME'),
+    'geolocation': os.getenv('ETK_GEOLOCATION_TABLE_NAME'),
+    'vi_submitted': os.getenv('DF_VI_SUBMITTED_TABLE_NAME'),
+    '12hr_submitted': os.getenv('DF_12HR_SUBMITTED_TABLE_NAME'),
+    '24hr_submitted': os.getenv('DF_24HR_SUBMITTED_TABLE_NAME')
+}
+source_db_mapping = {
+    'df': os.getenv('DF_BI_DB'),
+    'etk': os.getenv('ETK_BI_DB')
+}
+
 def map_event_type_destination(event_type):
-    if event_type=='app_accepted':
-        return os.getenv('DF_APP_ACCPTED_TABLE_NAME')
-    elif event_type=='disclosure_sent':
-        return os.getenv('DF_DISCLOSURE_SENT_TABLE_NAME')
-    elif event_type=='evidence_submitted':
-        return os.getenv('DF_EV_SUBMTTED_TABLE_NAME')
-    elif event_type=='payment_received':
-        return os.getenv('DF_PAY_RECVD_TABLE_NAME')
-    elif event_type=='review_scheduled':
-        return os.getenv('DF_REV_SCHED_TABLE_NAME')
-    elif event_type=='etk_disputeupdate':
-        return os.getenv('ETK_DISP_UPDATE_TABLE_NAME')
-    elif event_type=='etk_issuance':
-        return os.getenv('ETK_ISSUANCE_TABLE_NAME')
-    elif event_type=='etk_violations':
-        return os.getenv('ETK_VIOLATIONS_TABLE_NAME')
-    elif event_type=='etk_payment':
-        return os.getenv('ETK_PAYMENT_TABLE_NAME')
-    elif event_type=='payment_query':
-        return os.getenv('ETK_PAYQUERY_TABLE_NAME')
-    elif event_type=='etk_dispute':
-        return os.getenv('ETK_DISPUTE_TABLE_NAME')
-    elif event_type == 'geolocation':
-        return os.getenv('ETK_GEOLOCATION_TABLE_NAME')
+    tableName = event_table_mapping.get(event_type)
+    if tableName is None:
+        raise ValueError(f"Table name not found for event type: {event_type}")
+    return tableName
 
 def map_source_db(source):
-    if source=='df':
-        return os.getenv('DF_BI_DB')
-    elif source=='etk':
-        return os.getenv('ETK_BI_DB')
-
+    return source_db_mapping.get(source)
 
 def split_etk_event_payloads(payload,eventtype):
     payload_dict=json.loads(payload)
