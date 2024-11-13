@@ -21,7 +21,10 @@ class SqlDBFunctions():
             for v in keys:
                 if "payload".upper() in v.upper():
                     payloadKey=v
-            payloadForstr=tmpPayload[payloadKey][0]
+            if isinstance(tmpPayload[payloadKey], list):
+                payloadForstr=tmpPayload[payloadKey][0]
+            else:
+                payloadForstr=tmpPayload[payloadKey]
             for k,v in payloadForstr.items():
                 if not(v==None):
                     if (isinstance(v, str) and v.count("'") > 0):
