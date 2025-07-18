@@ -34,7 +34,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
             elif row['recon_count']>recon_threshold_count:
                 logger.debug('skipping row as recon count is more than threshold')
                 continue
-        if datasrc=='df':
+        if datasrc=='df' or datasrc=='accident':
             try:
                 if row['eventType']:
                     bi_table_name=map_event_type_destination(row['eventType'])
