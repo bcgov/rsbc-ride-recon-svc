@@ -22,6 +22,7 @@ event_table_mapping = {
 }
 source_db_mapping = {
     'df': os.getenv('DF_BI_DB'),
+    'accident': os.getenv('DF_BI_DB'),
     'etk': os.getenv('ETK_BI_DB')
 }
 
