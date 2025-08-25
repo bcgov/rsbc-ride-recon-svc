@@ -14,7 +14,7 @@ class SqlDBFunctions():
         # print('in prep str')
         # print(payload)
         tmpstr=''
-        if datasource=='df':
+        if datasource=='df' or datasource=='accident':
             tmpPayload=json.loads(payload)
             keys=tmpPayload.keys()
             payloadKey=""

@@ -22,7 +22,7 @@ def reconExceptions(dbclient: MongoClient,
         logger.debug(row["payloaddata"])
         
         datasrc=row['datasource']
-        if datasrc=='df':
+        if datasrc=='df' or datasrc=='accident':
             try:
                 if row['eventType']:
                     bi_table_name=map_event_type_destination(row['eventType'])
@@ -103,7 +103,7 @@ def reconExceptions(dbclient: MongoClient,
                     else:
                         retry_status=staging_retry_task(dbclient,row,logger)
                         if retry_status:
-                            main_staging_collection.delete_one(row)                   
+                            main_staging_collection.delete_one(row)
             except Exception as e:
                 logger.error('error in reconExceptions for this row')
                 logger.error(row)
