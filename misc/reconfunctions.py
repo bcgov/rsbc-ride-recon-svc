@@ -2,6 +2,8 @@
 import os
 from destsqldbfuncs import SqlDBFunctions
 from commonutils import map_event_type_destination,map_source_db,split_etk_event_payloads
+from datetime import datetime
+
 import json
 
 
@@ -43,6 +45,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,logg
                         if len(list(query_main_table)) > 0:
                             return True
                         else:
+                            row['timestamp'] = datetime.now().date() 
                             result = main_table_collection.insert_one(row)
                     else:
                         recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
