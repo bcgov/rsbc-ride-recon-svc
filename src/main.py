@@ -8,7 +8,7 @@ import uvicorn
 import logging
 from typing import List, Optional
 
-from reconfunctions import recondestination
+from reconfunctions import recondestination, delete_old_records
 from errorretryfunctions import error_retry_task
 
 
@@ -164,6 +164,25 @@ async def get_records(request: Request,collection_name: Optional[str] = Query(..
         logging.error('error in query')
         logging.error(e)
     return JSONResponse(status_code=status_code, content=qry_resp)
+    
+
+@app.get('/ridecleanup', response_class=JSONResponse)
+async def ride_cleanup():
+    logging.info('trigering error retry job')
+    respstatus = {"status": "failure"}
+    status_code = 500
+    try:
+        delete_recon_out=delete_old_records(main_table_collection, logging)
+        if not(delete_recon_out):
+            raise Exception('error in deleting the rows during retry')
+        respstatus = {"status": "success"}
+        status_code = 200
+    except Exception as e:
+        logging.info('error in error retry job')
+        logging.error('error in eror retry job')
+        logging.error(e)
+
+    return JSONResponse(status_code=status_code, content=respstatus)
 
 
 @app.patch('/updateevent/{eventid}', response_class=JSONResponse)
@@ -203,3 +222,6 @@ async def update_status(eventid: int, payload: dict):
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=5001, reload=True)
+
+
+
