@@ -3,8 +3,20 @@ import os
 from destsqldbfuncs import SqlDBFunctions
 from commonutils import map_event_type_destination,map_source_db,split_etk_event_payloads
 from errorretryfunctions import staging_retry_task
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
+
+RETENTION_DAYS = 90
+
+def delete_old_records(main_table_collection, logger):
+    """Deletes records from main_table_collection where timestamp is older than RETENTION_DAYS"""
+    cutoff_date = datetime.now() - timedelta(days=RETENTION_DAYS)
+
+    result = main_table_collection.delete_many({
+        "timestamp": {"$lt": cutoff_date}
+    })
+
+    logger.info(f"Deleted {result.deleted_count} records older than {RETENTION_DAYS} days from main table.")
 
 
 def recondestination(dbclient,main_staging_collection,main_table_collection,recon_threshold_count,logger):
@@ -161,3 +173,6 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
  #                # found=bi_sql_db_obj.reconQuery(reconqrystr)
  #                # print(qrystr)
  #                # found=False
+
+
+
