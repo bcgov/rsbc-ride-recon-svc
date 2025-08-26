@@ -108,6 +108,24 @@ async def recon_destination():
 
     return JSONResponse(status_code=status_code, content=respstatus)
 
+@app.get('/ridecleanup', response_class=JSONResponse)
+async def recon_destination():
+    logging.info('trigering recon job')
+    respstatus = {"status": "failure"}
+    status_code = 500
+    try:
+        recon_out=delete_old_records(main_table_collection, logging)
+        if not(recon_out):
+            raise Exception('error in deleting the rows during recon')
+        respstatus = {"status": "success"}
+        status_code = 200
+    except Exception as e:
+        logging.info('error in recon job')
+        logging.error('error in recon job')
+        logging.error(e)
+
+    return JSONResponse(status_code=status_code, content=respstatus)
+
 @app.get('/rideerrorretry', response_class=JSONResponse)
 async def error_retry():
     logging.info('trigering error retry job')
