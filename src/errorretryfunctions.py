@@ -5,7 +5,7 @@ from producerapifuncs import producerAPITasks
 def error_retry_task(dbclient,err_staging_collection,err_table_collection,err_threshold,logger):
 
     #DONE: Query error staging
-    results = err_staging_collection.find()
+    results = err_staging_collection.find().limit(200)
     errretrystatus = True
     # logger.info(f'found {len(list(results))} rows in error staging table')
     #DONE: For each do below
