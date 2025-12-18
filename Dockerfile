@@ -13,6 +13,12 @@ ENV TESTING 0
 WORKDIR /app
 COPY src/ .
 RUN pip install --no-cache-dir -r requirements.txt
+USER 0
+RUN dnf remove -y openssh openssh-clients && dnf clean all
+RUN dnf remove -y httpd httpd-devel httpd-tools httpd-filesystem && \
+    dnf clean all && rm -rf /var/cache/dnf
+
+
 # RUN chown -R app:app /app
 # USER app
 # CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]

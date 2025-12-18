@@ -3,7 +3,42 @@ import os
 from destsqldbfuncs import SqlDBFunctions
 from commonutils import map_event_type_destination,map_source_db,split_etk_event_payloads
 from errorretryfunctions import staging_retry_task
+from datetime import datetime, timedelta
 import json
+
+RETENTION_DAYS = 90
+
+
+def delete_old_records(main_table_collection, logger):
+    """
+    Deletes records from main_table_collection that are:
+    - older than RETENTION_DAYS based on the 'timestamp' field, OR
+    - missing the 'timestamp' field entirely.
+    """
+    try:
+        cutoff_date = datetime.now() - timedelta(days=RETENTION_DAYS)
+
+        # Construct query to delete:
+        # - documents with timestamp older than cutoff_date
+        # - documents that do not have a timestamp field
+        delete_query = {
+            "$or": [
+                {"timestamp": {"$lt": cutoff_date}},
+                {"timestamp": {"$exists": False}}
+            ]
+        }
+
+        result = main_table_collection.delete_many(delete_query)
+
+        logger.info(f"Deleted {result.deleted_count} records older than {RETENTION_DAYS} days "
+                    f"or without a timestamp from the main table.")
+        return True
+    except Exception as e:
+        logger.error("Error occurred while deleting old or invalid timestamp records from main table.")
+        logger.error(f"Exception: {e}")
+        return False
+
+    
 
 
 def recondestination(dbclient,main_staging_collection,main_table_collection,recon_threshold_count,logger):
@@ -34,7 +69,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
             elif row['recon_count']>recon_threshold_count:
                 logger.debug('skipping row as recon count is more than threshold')
                 continue
-        if datasrc=='df':
+        if datasrc=='df' or datasrc=='accident':
             try:
                 if row['eventType']:
                     bi_table_name=map_event_type_destination(row['eventType'])
@@ -55,6 +90,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
                         if len(list(query_main_table)) > 0:
                             return True
                         else:
+                            row['timestamp'] = datetime.now()
                             result = main_table_collection.insert_one(row)
                     else:
                         recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
@@ -131,6 +167,7 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
                         if len(list(query_main_table)) > 0:
                             return True
                         else:
+                            row['timestamp'] = datetime.now()
                             result = main_table_collection.insert_one(row)
                     else:
                         recon_count_val = (lambda x: 1 if not ('recon_count' in x.keys()) else x['recon_count'] + 1)(row)
@@ -158,3 +195,6 @@ def recondestination(dbclient,main_staging_collection,main_table_collection,reco
  #                # found=bi_sql_db_obj.reconQuery(reconqrystr)
  #                # print(qrystr)
  #                # found=False
+
+
+
