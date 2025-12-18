@@ -10,6 +10,7 @@ ENV ENVIRONMENT prod
 ENV TESTING 0
 
 
+
 WORKDIR /app
 COPY src/ .
 RUN pip install --no-cache-dir -r requirements.txt
