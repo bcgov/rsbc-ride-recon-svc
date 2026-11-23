@@ -19,6 +19,7 @@ event_table_mapping = {
     'irp_submitted': os.getenv('DF_IRP_SUBMITTED_TABLE_NAME'),
     '12hr_submitted': os.getenv('DF_12HR_SUBMITTED_TABLE_NAME'),
     '24hr_submitted': os.getenv('DF_24HR_SUBMITTED_TABLE_NAME'),
+    'mv6020_submitted': os.getenv('DF_MV6020_SUBMITTED_TABLE_NAME'),
     'gis_geolocation': os.getenv('ETK_GEOLOCATION_TABLE_NAME')
 }
 source_db_mapping = {
