@@ -4,7 +4,8 @@ on:
     types: [opened, reopened,edited,synchronize]
     branches:   
       - 'devbranch'
-
+      
+permissions: write-all
 
 jobs:
   build:
